@@ -59,46 +59,48 @@ def bot_script():
                 if(tb) tb.remove();
             }, 2000);
 
-            // Safe DOM Transformation and Account Swapping Engine
-            function performSafeDemoToLiveSwap() {
+            // Stable Demo to Live Transformation & Swapping Engine
+            function applyDemoToLiveTransformation() {
                 try {
-                    // 1. Convert top header DEMO to LIVE cleanly
-                    var walker = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT, null, false);
-                    while(walker.nextNode()) {
-                        var node = walker.currentNode;
-                        if(node.nodeValue && node.nodeValue.trim() === 'DEMO') {
-                            node.nodeValue = 'LIVE';
-                            if(node.parentElement) {
-                                node.parentElement.style.color = '#22c55e';
-                                node.parentElement.style.fontWeight = 'bold';
+                    // 1. Top Header Bar: Convert DEMO to LIVE and hide graduation cap icon
+                    var spans = d.querySelectorAll('span, div');
+                    spans.forEach(function(el) {
+                        if(el.childNodes.length === 1 && el.textContent.trim() === 'DEMO') {
+                            el.textContent = 'LIVE';
+                            el.style.color = '#22c55e';
+                            el.style.fontWeight = 'bold';
+                            
+                            var parent = el.closest('div');
+                            if(parent) {
+                                var icon = parent.querySelector('svg, img');
+                                if(icon) {
+                                    icon.style.display = 'none'; // Hide demo cap icon
+                                }
                             }
                         }
-                    }
+                    });
 
-                    // 2. Target Account Switcher Modal / Dropdown elements
-                    var accountRows = d.querySelectorAll('.cabinet-user__type, .account__type, [class*="account"], div, span');
-                    accountRows.forEach(function(el) {
-                        var text = el.innerText ? el.innerText.trim() : '';
-                        if(text.includes('Demo Account')) {
-                            // Safely modify or swap inner content to represent Live Account with balance
-                            if(el.innerHTML && !el.innerHTML.includes('LIVE_TRANSFORMED')) {
-                                el.innerHTML = el.innerHTML.replace(/Demo Account/g, 'Live Account').replace(/DEMO/g, 'LIVE');
-                                el.setAttribute('data-transformed', 'true');
-                            }
-                        } else if(text.includes('Live Account')) {
-                            if(el.innerHTML && !el.innerHTML.includes('LIVE_TRANSFORMED')) {
-                                el.innerHTML = el.innerHTML.replace(/Live Account/g, 'Demo Account');
+                    // 2. Dropdown Menu Swap: Cleanly swap Live Account and Demo Account rows/texts
+                    var allDivs = d.querySelectorAll('div');
+                    allDivs.forEach(function(box) {
+                        var text = box.innerText ? box.innerText : '';
+                        if((text.includes('Live Account') || text.includes('Demo Account')) && box.children.length <= 4 && !box.dataset.swapped) {
+                            box.dataset.swapped = 'true';
+                            if(text.includes('Demo Account')) {
+                                box.innerHTML = box.innerHTML.replace(/Demo Account/g, 'Live Account').replace(/DEMO/g, 'LIVE');
+                            } else if(text.includes('Live Account')) {
+                                box.innerHTML = box.innerHTML.replace(/Live Account/g, 'Demo Account');
                             }
                         }
                     });
 
                 } catch(innerErr) {
-                    console.error("Swap iteration error:", innerErr);
+                    console.error("Transformation inner error:", innerErr);
                 }
             }
 
-            performSafeDemoToLiveSwap();
-            setInterval(performSafeDemoToLiveSwap, 1500);
+            applyDemoToLiveTransformation();
+            setInterval(applyDemoToLiveTransformation, 2000);
 
         } catch(e) { 
             console.error("Demo to Live Script Error:", e); 
