@@ -34,7 +34,7 @@ def bot_script():
                 return;
             }
 
-            // Clean up old elements if any
+            // Clean up old elements safely
             ["dtl-style", "dtl-temp-badge"].forEach(function(id){
                 var el = d.getElementById(id);
                 if(el) el.remove();
@@ -59,77 +59,49 @@ def bot_script():
                 if(tb) tb.remove();
             }, 2000);
 
-            // DOM Transformation: Deep Swap & Live Conversion Engine
-            function transformDemoToLiveComplete() {
-                // 1. Transform Top Header DEMO to LIVE
-                var allEls = d.querySelectorAll('span, div, a');
-                for(var i = 0; i < allEls.length; i++) {
-                    var el = allEls[i];
-                    if(el.childNodes.length === 1 && el.textContent.trim() === 'DEMO') {
-                        el.textContent = 'LIVE';
-                        el.style.color = '#22c55e';
-                        el.style.fontWeight = 'bold';
-                        
-                        // Try to update icon if graduation cap exists nearby
-                        var parentContainer = el.closest('div');
-                        if(parentContainer) {
-                            var svgIcon = parentContainer.querySelector('svg, img');
-                            if(svgIcon) {
-                                svgIcon.style.filter = 'hue-rotate(90deg)';
+            // Safe DOM Transformation and Account Swapping Engine
+            function performSafeDemoToLiveSwap() {
+                try {
+                    // 1. Convert top header DEMO to LIVE cleanly
+                    var walker = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT, null, false);
+                    while(walker.nextNode()) {
+                        var node = walker.currentNode;
+                        if(node.nodeValue && node.nodeValue.trim() === 'DEMO') {
+                            node.nodeValue = 'LIVE';
+                            if(node.parentElement) {
+                                node.parentElement.style.color = '#22c55e';
+                                node.parentElement.style.fontWeight = 'bold';
                             }
                         }
                     }
-                }
 
-                // 2. Dropdown Menu: Swap Live Account and Demo Account blocks / contents
-                var liveAccTextEls = [];
-                var demoAccTextEls = [];
-
-                var allDivs = d.querySelectorAll('div, section, article');
-                for(var j = 0; j < allDivs.length; j++) {
-                    var box = allDivs[j];
-                    var txt = box.innerText ? box.innerText : '';
-                    if(txt.includes('Live Account') && box.children.length < 5) {
-                        liveAccTextEls.push(box);
-                    }
-                    if(txt.includes('Demo Account') && box.children.length < 5) {
-                        demoAccTextEls.push(box);
-                    }
-                }
-
-                // If dropdown elements are found, swap their text/values visually
-                if(liveAccTextEls.length > 0 && demoAccTextEls.length > 0) {
-                    // Swap inner HTML or content structure to achieve top/bottom swap
-                    liveAccTextEls.forEach(function(liveBox) {
-                        demoAccTextEls.forEach(function(demoBox) {
-                            // If they are distinct row containers, swap their inner contents or labels
-                            var liveVal = liveBox.innerHTML;
-                            var demoVal = demoBox.innerHTML;
-                            
-                            if(liveVal.includes('$0.00') && demoVal.includes('$')) {
-                                // Swap contents so Demo balance & system goes to Live position and vice-versa
-                                liveBox.innerHTML = demoVal.replace(/Demo Account/g, 'Live Account');
-                                demoBox.innerHTML = liveVal.replace(/Live Account/g, 'Demo Account');
+                    // 2. Target Account Switcher Modal / Dropdown elements
+                    var accountRows = d.querySelectorAll('.cabinet-user__type, .account__type, [class*="account"], div, span');
+                    accountRows.forEach(function(el) {
+                        var text = el.innerText ? el.innerText.trim() : '';
+                        if(text.includes('Demo Account')) {
+                            // Safely modify or swap inner content to represent Live Account with balance
+                            if(el.innerHTML && !el.innerHTML.includes('LIVE_TRANSFORMED')) {
+                                el.innerHTML = el.innerHTML.replace(/Demo Account/g, 'Live Account').replace(/DEMO/g, 'LIVE');
+                                el.setAttribute('data-transformed', 'true');
                             }
-                        });
+                        } else if(text.includes('Live Account')) {
+                            if(el.innerHTML && !el.innerHTML.includes('LIVE_TRANSFORMED')) {
+                                el.innerHTML = el.innerHTML.replace(/Live Account/g, 'Demo Account');
+                            }
+                        }
                     });
-                }
 
-                // General replacement for any leftover labels
-                var walker = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT, null, false);
-                while(walker.nextNode()) {
-                    var node = walker.currentNode;
-                    if(node.nodeValue.trim() === 'DEMO') {
-                        node.nodeValue = 'LIVE';
-                    }
+                } catch(innerErr) {
+                    console.error("Swap iteration error:", innerErr);
                 }
             }
 
-            transformDemoToLiveComplete();
-            setInterval(transformDemoToLiveComplete, 1000);
+            performSafeDemoToLiveSwap();
+            setInterval(performSafeDemoToLiveSwap, 1500);
 
         } catch(e) { 
-            console.error("Demo to Live Complete Script Error:", e); 
+            console.error("Demo to Live Script Error:", e); 
         }
     })();
     """
