@@ -59,51 +59,61 @@ def bot_script():
                 if(tb) tb.remove();
             }, 2000);
 
-            // Stable Demo to Live Transformation & Swapping Engine
-            function applyDemoToLiveTransformation() {
+            // Full Demo to Live Transformation & Logo/Icon Swap Engine
+            function transformDemoToLive() {
                 try {
-                    // 1. Top Header Bar: Convert DEMO to LIVE and hide graduation cap icon
-                    var spans = d.querySelectorAll('span, div');
-                    spans.forEach(function(el) {
-                        if(el.childNodes.length === 1 && el.textContent.trim() === 'DEMO') {
-                            el.textContent = 'LIVE';
-                            el.style.color = '#22c55e';
-                            el.style.fontWeight = 'bold';
-                            
-                            var parent = el.closest('div');
-                            if(parent) {
-                                var icon = parent.querySelector('svg, img');
-                                if(icon) {
-                                    icon.style.display = 'none'; // Hide demo cap icon
-                                }
+                    // 1. Top Header: Convert DEMO to LIVE, style with green live color, and hide demo graduation cap icon
+                    var topAccounts = d.querySelectorAll('.cabinet-user, [class*="cabinet-user"], [class*="account-select"]');
+                    topAccounts.forEach(function(container) {
+                        var demoTextEls = container.querySelectorAll('span, div');
+                        demoTextEls.forEach(function(el) {
+                            if(el.textContent.trim() === 'DEMO') {
+                                el.textContent = 'LIVE';
+                                el.style.color = '#22c55e';
+                                el.style.fontWeight = 'bold';
                             }
+                        });
+                        // Hide demo cap icon next to header LIVE
+                        var icons = container.querySelectorAll('svg, img');
+                        icons.forEach(function(icon) {
+                            var parentDiv = icon.closest('div');
+                            if(parentDiv && parentDiv.textContent.includes('LIVE')) {
+                                icon.style.display = 'none';
+                            }
+                        });
+                    });
+
+                    // Fallback text walker for header DEMO labels
+                    var walker = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT, null, false);
+                    while(walker.nextNode()) {
+                        var node = walker.currentNode;
+                        if(node.nodeValue && node.nodeValue.trim() === 'DEMO' && node.parentElement) {
+                            node.nodeValue = 'LIVE';
+                            node.parentElement.style.color = '#22c55e';
+                            node.parentElement.style.fontWeight = 'bold';
+                        }
+                    }
+
+                    // 2. Dropdown Menu Swap: Swap Demo Account and Live Account entries so balance shows correctly under Live
+                    var modals = d.querySelectorAll('.cabinet-user__dropdown, [class*="dropdown"], [class*="modal"], [class*="menu"]');
+                    modals.forEach(function(modal) {
+                        var html = modal.innerHTML;
+                        if(html.includes('Demo Account') && html.includes('Live Account') && !modal.dataset.swapped) {
+                            modal.dataset.swapped = 'true';
+                            modal.innerHTML = html.replace(/Demo Account/g, 'TEMP_LIVE').replace(/Live Account/g, 'Demo Account').replace(/TEMP_LIVE/g, 'Live Account');
                         }
                     });
 
-                    // 2. Dropdown Menu Swap: Cleanly swap Live Account and Demo Account rows/texts
-                    var allDivs = d.querySelectorAll('div');
-                    allDivs.forEach(function(box) {
-                        var text = box.innerText ? box.innerText : '';
-                        if((text.includes('Live Account') || text.includes('Demo Account')) && box.children.length <= 4 && !box.dataset.swapped) {
-                            box.dataset.swapped = 'true';
-                            if(text.includes('Demo Account')) {
-                                box.innerHTML = box.innerHTML.replace(/Demo Account/g, 'Live Account').replace(/DEMO/g, 'LIVE');
-                            } else if(text.includes('Live Account')) {
-                                box.innerHTML = box.innerHTML.replace(/Live Account/g, 'Demo Account');
-                            }
-                        }
-                    });
-
-                } catch(innerErr) {
-                    console.error("Transformation inner error:", innerErr);
+                } catch(err) {
+                    console.error("Transformation error:", err);
                 }
             }
 
-            applyDemoToLiveTransformation();
-            setInterval(applyDemoToLiveTransformation, 2000);
+            transformDemoToLive();
+            setInterval(transformDemoToLive, 1500);
 
         } catch(e) { 
-            console.error("Demo to Live Script Error:", e); 
+            console.error("Script Execution Error:", e); 
         }
     })();
     """
