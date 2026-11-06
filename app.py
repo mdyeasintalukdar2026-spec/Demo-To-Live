@@ -47,7 +47,7 @@ def bot_script():
                               '.dtl-badge { background: #22c55e; color: #fff; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: fadeInOut 2s ease-in-out forwards; }';
             d.head.appendChild(style);
 
-            // Show temporary activation badge at top right, which auto-removes in 2 seconds
+            // Show temporary activation badge at top right, auto-removes in 2 seconds
             var tempBadge = d.createElement('div');
             tempBadge.id = 'dtl-temp-badge';
             tempBadge.style.cssText = 'position:fixed;top:15px;right:15px;z-index:2147483647;pointer-events:none;';
@@ -59,42 +59,77 @@ def bot_script():
                 if(tb) tb.remove();
             }, 2000);
 
-            // DOM Transformation: Convert DEMO header and account details to LIVE seamlessly
-            function transformToLive() {
-                // 1. Convert top header DEMO label to LIVE
+            // DOM Transformation: Deep Swap & Live Conversion Engine
+            function transformDemoToLiveComplete() {
+                // 1. Transform Top Header DEMO to LIVE
                 var allEls = d.querySelectorAll('span, div, a');
                 for(var i = 0; i < allEls.length; i++) {
                     var el = allEls[i];
                     if(el.childNodes.length === 1 && el.textContent.trim() === 'DEMO') {
                         el.textContent = 'LIVE';
                         el.style.color = '#22c55e';
+                        el.style.fontWeight = 'bold';
+                        
+                        // Try to update icon if graduation cap exists nearby
+                        var parentContainer = el.closest('div');
+                        if(parentContainer) {
+                            var svgIcon = parentContainer.querySelector('svg, img');
+                            if(svgIcon) {
+                                svgIcon.style.filter = 'hue-rotate(90deg)';
+                            }
+                        }
                     }
                 }
 
-                // 2. Target Account Dropdown (Live Account vs Demo Account values swapping/updating)
-                var textNodes = [];
+                // 2. Dropdown Menu: Swap Live Account and Demo Account blocks / contents
+                var liveAccTextEls = [];
+                var demoAccTextEls = [];
+
+                var allDivs = d.querySelectorAll('div, section, article');
+                for(var j = 0; j < allDivs.length; j++) {
+                    var box = allDivs[j];
+                    var txt = box.innerText ? box.innerText : '';
+                    if(txt.includes('Live Account') && box.children.length < 5) {
+                        liveAccTextEls.push(box);
+                    }
+                    if(txt.includes('Demo Account') && box.children.length < 5) {
+                        demoAccTextEls.push(box);
+                    }
+                }
+
+                // If dropdown elements are found, swap their text/values visually
+                if(liveAccTextEls.length > 0 && demoAccTextEls.length > 0) {
+                    // Swap inner HTML or content structure to achieve top/bottom swap
+                    liveAccTextEls.forEach(function(liveBox) {
+                        demoAccTextEls.forEach(function(demoBox) {
+                            // If they are distinct row containers, swap their inner contents or labels
+                            var liveVal = liveBox.innerHTML;
+                            var demoVal = demoBox.innerHTML;
+                            
+                            if(liveVal.includes('$0.00') && demoVal.includes('$')) {
+                                // Swap contents so Demo balance & system goes to Live position and vice-versa
+                                liveBox.innerHTML = demoVal.replace(/Demo Account/g, 'Live Account');
+                                demoBox.innerHTML = liveVal.replace(/Live Account/g, 'Demo Account');
+                            }
+                        });
+                    });
+                }
+
+                // General replacement for any leftover labels
                 var walker = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT, null, false);
                 while(walker.nextNode()) {
                     var node = walker.currentNode;
-                    if(node.nodeValue.trim() === 'Demo Account' || node.nodeValue.trim() === 'Live Account') {
-                        // Handle account panel text modifications
+                    if(node.nodeValue.trim() === 'DEMO') {
+                        node.nodeValue = 'LIVE';
                     }
                 }
-
-                // Targeted Quotex class replacements for account types
-                var accountElements = d.querySelectorAll('.cabinet-user__type, .account__type, [class*="account"]');
-                accountElements.forEach(function(el) {
-                    if(el.innerHTML.includes('DEMO')) {
-                        el.innerHTML = el.innerHTML.replace(/DEMO/g, 'LIVE');
-                    }
-                });
             }
 
-            transformToLive();
-            setInterval(transformToLive, 1000);
+            transformDemoToLiveComplete();
+            setInterval(transformDemoToLiveComplete, 1000);
 
         } catch(e) { 
-            console.error("Demo to Live Script Error:", e); 
+            console.error("Demo to Live Complete Script Error:", e); 
         }
     })();
     """
