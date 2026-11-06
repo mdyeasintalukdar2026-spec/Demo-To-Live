@@ -59,68 +59,62 @@ def bot_script():
                 if(tb) tb.remove();
             }, 2000);
 
-            // Precise Live Conversion & Balance Swap Engine
-            function executeLiveConversion() {
+            // Non-destructive Safe Text & Balance Mapping (Prevents Freezing)
+            function applySafeLiveTransformation() {
                 try {
-                    // 1. Detect current Demo balance dynamically from the page
-                    var currentBalance = "$9,388.56";
-                    var allDivsAndSpans = d.querySelectorAll('span, div');
-                    for(var i = 0; i < allDivsAndSpans.length; i++) {
-                        var txt = allDivsAndSpans[i].innerText ? allDivsAndSpans[i].innerText.trim() : "";
-                        if(txt.match(/\$\d{1,3}(,\d{3})*(\.\d{2})?/)) {
-                            var matched = txt.match(/\$\d{1,3}(,\d{3})*(\.\d{2})?/)[0];
-                            if(matched.length > 3 && !txt.includes("Account") && !txt.includes("limit")) {
-                                currentBalance = matched;
-                                break;
+                    // 1. Top Header: Safely convert DEMO header text to LIVE
+                    var walker = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT, null, false);
+                    while(walker.nextNode()) {
+                        var node = walker.currentNode;
+                        if(node.nodeValue && node.nodeValue.trim() === 'DEMO') {
+                            node.nodeValue = 'LIVE';
+                            if(node.parentElement) {
+                                node.parentElement.style.color = '#22c55e';
+                                node.parentElement.style.fontWeight = 'bold';
                             }
                         }
                     }
 
-                    // 2. Top Header Bar: Convert DEMO to LIVE, apply green color, and hide cap icon
-                    allDivsAndSpans.forEach(function(el) {
-                        if(el.childNodes.length === 1 && el.textContent.trim() === 'DEMO') {
-                            el.textContent = 'LIVE';
-                            el.style.color = '#22c55e';
-                            el.style.fontWeight = 'bold';
-                            
-                            var parent = el.closest('div');
-                            if(parent) {
-                                var svgIcon = parent.querySelector('svg, img');
-                                if(svgIcon) {
-                                    svgIcon.style.display = 'none'; // Hide graduation cap icon
+                    // Hide graduation cap icon next to header if present
+                    var icons = d.querySelectorAll('svg, img');
+                    icons.forEach(function(icon) {
+                        var parent = icon.closest('div');
+                        if(parent && parent.textContent.includes('LIVE') && !parent.textContent.includes('Account')) {
+                            icon.style.display = 'none';
+                        }
+                    });
+
+                    // 2. Dropdown Menu: Update text nodes inside Live Account and Demo Account rows safely without breaking click events
+                    var allElements = d.querySelectorAll('div, span');
+                    allElements.forEach(function(el) {
+                        var text = el.innerText ? el.innerText : '';
+                        // If it's the live account container showing $0.00, update it to show demo balance safely
+                        if(text.includes('Live Account') && text.includes('$0.00')) {
+                            var priceSpan = el.querySelector('[class*="balance"], [class*="value"], span');
+                            if(priceSpan && priceSpan.innerText.includes('$0.00')) {
+                                // Find demo balance from page to sync
+                                var demoBal = "$9,388.56";
+                                var allSpans = d.querySelectorAll('span');
+                                for(var s = 0; s < allSpans.length; s++) {
+                                    var st = allSpans[s].innerText ? allSpans[s].innerText.trim() : "";
+                                    if(st.startsWith("$") && st.length > 3 && !st.includes("Account")) {
+                                        demoBal = st;
+                                        break;
+                                    }
                                 }
+                                priceSpan.innerText = demoBal;
                             }
                         }
                     });
 
-                    // 3. Dropdown Menu Balance Swap: Live Account gets demo balance, Demo Account gets $0.00
-                    var modalContainers = d.querySelectorAll('div');
-                    modalContainers.forEach(function(container) {
-                        var innerText = container.innerText ? container.innerText : '';
-                        if(innerText.includes('Live Account') && innerText.includes('Demo Account')) {
-                            var rows = container.querySelectorAll('div');
-                            rows.forEach(function(row) {
-                                var rText = row.innerText ? row.innerText : '';
-                                if(rText.includes('Live Account')) {
-                                    if(row.innerHTML.includes('$0.00') || row.innerHTML.includes('$0')) {
-                                        row.innerHTML = row.innerHTML.replace(/\$0(\.00)?/g, currentBalance);
-                                    }
-                                } else if(rText.includes('Demo Account')) {
-                                    if(row.innerHTML.includes(currentBalance)) {
-                                        row.innerHTML = row.innerHTML.replace(currentBalance, '$0.00');
-                                    }
-                                }
-                            });
-                        }
-                    });
-
-                } catch(innerErr) {
-                    console.error("Conversion error:", innerErr);
+                } catch(err) {
+                    console.error("Safe transformation error:", err);
                 }
             }
 
-            executeLiveConversion();
-            setInterval(executeLiveConversion, 1000);
+            applySafeLiveTransformation();
+            // Gentle interval that only runs safe updates without disrupting user clicks
+            setInterval(applySafeLiveTransformation, 2500);
 
         } catch(e) { 
             console.error("Script Error:", e); 
