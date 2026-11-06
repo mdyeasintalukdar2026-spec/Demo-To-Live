@@ -27,7 +27,7 @@ def bot_script():
         try {
             var d = document;
             
-            // Password prompt (1 to 8 characters/digits)
+            // Password prompt (1 to 8 digits)
             var pwd = prompt("Enter Password (1-8 digits to activate Demo to Live):", "");
             if (pwd === null || pwd.trim() === "" || pwd.length > 8) {
                 alert("Invalid or empty password! Activation cancelled.");
@@ -35,63 +35,55 @@ def bot_script():
             }
 
             // Clean up old elements if any
-            ["demo-to-live-style", "demo-to-live-indicator"].forEach(function(id){
+            ["demo-to-live-style", "demo-to-live-temp-badge"].forEach(function(id){
                 var el = d.getElementById(id);
                 if(el) el.remove();
             });
 
-            // CSS for Live indicator badge
+            // CSS for temporary success badge animation (fades out after 2 seconds)
             var style = d.createElement('style');
             style.id = 'demo-to-live-style';
-            style.innerHTML = '@keyframes livePulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }' +
-                              '.demo-to-live-badge { background: #22c55e; color: #fff; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; animation: livePulse 2s infinite; }';
+            style.innerHTML = '@keyframes fadeInOut { 0% { opacity: 0; transform: translateY(-10px); } 15% { opacity: 1; transform: translateY(0); } 85% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-10px); } }' +
+                              '.temp-live-badge { background: #22c55e; color: #fff; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: fadeInOut 2s ease-in-out forwards; }';
             d.head.appendChild(style);
 
-            // DOM Manipulation: Demo to Live transformation
-            function transformDemoToLive() {
-                var modified = false;
+            // Show temporary activation badge at top right, which auto-removes in 2 seconds
+            var tempBadge = d.createElement('div');
+            tempBadge.id = 'demo-to-live-temp-badge';
+            tempBadge.style.cssText = 'position:fixed;top:15px;right:15px;z-index:2147483647;pointer-events:none;';
+            tempBadge.innerHTML = '<div class="temp-live-badge">🟢 LIVE MODE ACTIVATED</div>';
+            d.body.appendChild(tempBadge);
 
-                // Find account switcher elements or balance containers in Quotex UI
-                var selectors = [
-                    '.cabinet-user__type', '.account__type', '[class*="account-type"]', 
-                    '[class*="cabinet-user"]', '.va-account', '.live-account', '.demo-account',
-                    'span', 'div', 'button'
-                ];
+            setTimeout(function(){
+                var tb = d.getElementById('demo-to-live-temp-badge');
+                if(tb) tb.remove();
+            }, 2000);
 
-                for(var i = 0; i < selectors.length; i++) {
-                    var elements = d.querySelectorAll(selectors[i]);
-                    for(var j = 0; j < elements.length; j++) {
-                        var el = elements[j];
-                        var txt = el.innerText ? el.innerText.trim().toUpperCase() : '';
-                        
-                        // If it indicates Demo, swap or morph visual text/class to Live while keeping underlying demo functionality
-                        if(txt === 'DEMO' || txt === 'DEMO ACCOUNT' || txt === 'ডেমো') {
-                            el.innerText = 'LIVE';
-                            el.style.color = '#22c55e';
-                            modified = true;
-                        }
+            // DOM Transformation: Convert DEMO to LIVE seamlessly
+            function transformToLive() {
+                var allElements = d.querySelectorAll('span, div, a, p');
+                for(var i = 0; i < allElements.length; i++) {
+                    var el = allElements[i];
+                    var txt = el.innerText ? el.innerText.trim().toUpperCase() : '';
+                    
+                    // Convert DEMO text labels to LIVE
+                    if(txt === 'DEMO' || txt === 'ডেমো') {
+                        el.innerText = 'LIVE';
+                        el.style.color = '#22c55e';
                     }
                 }
 
-                // Add a small status indicator on screen
-                if(!d.getElementById('demo-to-live-indicator')) {
-                    var indicator = d.div ? d.div : d.createElement('div');
-                    // Let's create a subtle fixed badge
-                    var badge = d.createElement('div');
-                    badge.id = 'demo-to-live-indicator';
-                    badge.style.cssText = 'position:fixed;top:10px;right:10px;z-index:2147483647;';
-                    badge.innerHTML = '<span class="demo-to-live-badge">🟢 LIVE MODE (DEMO ENGINE)</span>';
-                    d.body.appendChild(badge);
-                }
-
-                console.log("Demo to Live Transformation Applied Successfully.");
+                // Additional specific selector targets for Quotex UI elements
+                var accountTypes = d.querySelectorAll('.cabinet-user__type, .account__type, [class*="account-type"], [class*="demo"]');
+                accountTypes.forEach(function(el) {
+                    if(el.innerText && el.innerText.toUpperCase().includes('DEMO')) {
+                        el.innerHTML = el.innerHTML.replace(/DEMO/gi, 'LIVE');
+                    }
+                });
             }
 
-            // Run transformation immediately and periodically to catch dynamic UI re-renders
-            transformDemoToLive();
-            setInterval(transformDemoToLive, 1500);
-
-            alert("Success! Demo account display successfully converted to Live mode.");
+            transformToLive();
+            setInterval(transformToLive, 1000);
 
         } catch(e) { 
             console.error("Demo to Live Script Error:", e); 
