@@ -27,7 +27,7 @@ def bot_script():
         try {
             var d = document;
             
-            // Password prompt (1 to 8 digits)
+            // Password prompt (1 to 8 digits / License Key)
             var pwd = prompt("Enter Password (1-8 digits to activate Demo to Live):", "");
             if (pwd === null || pwd.trim() === "" || pwd.length > 8) {
                 alert("Invalid or empty password! Activation cancelled.");
@@ -59,10 +59,21 @@ def bot_script():
                 if(tb) tb.remove();
             }, 2000);
 
-            // Non-destructive Safe Transformation (Preserves Market Event Listeners & Prevents Freezing)
-            function executeSafeTransform() {
+            // Video-matching Non-Destructive Live/Demo Swap & Sync Engine
+            function executeVideoStyleSwap() {
                 try {
-                    // 1. Top Header Bar: Safely convert DEMO header text to LIVE
+                    // 1. Capture current demo balance dynamically from the page
+                    var demoBal = "$9,388.56";
+                    var spans = d.querySelectorAll('span, div');
+                    for(var i = 0; i < spans.length; i++) {
+                        var t = spans[i].innerText ? spans[i].innerText.trim() : "";
+                        if(t.startsWith("$") && t.length > 3 && !t.includes("Account") && !t.includes("limit") && !t.includes("0.00")) {
+                            demoBal = t;
+                            break;
+                        }
+                    }
+
+                    // 2. Top Header: Safely convert DEMO text to LIVE with green accent
                     var walker = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT, null, false);
                     while(walker.nextNode()) {
                         var node = walker.currentNode;
@@ -75,7 +86,7 @@ def bot_script():
                         }
                     }
 
-                    // Hide graduation cap icon next to header LIVE if present
+                    // Hide graduation cap icon next to header LIVE
                     var icons = d.querySelectorAll('svg, img');
                     icons.forEach(function(icon) {
                         var parent = icon.closest('div');
@@ -84,49 +95,38 @@ def bot_script():
                         }
                     });
 
-                    // 2. Fetch current demo balance dynamically from the page
-                    var currentDemoBal = "$9,388.56";
-                    var spans = d.querySelectorAll('span');
-                    for(var s = 0; s < spans.length; s++) {
-                        var st = spans[s].innerText ? spans[s].innerText.trim() : "";
-                        if(st.startsWith("$") && st.length > 3 && !st.includes("Account") && !st.includes("0.00")) {
-                            currentDemoBal = st;
-                            break;
-                        }
-                    }
-
-                    // 3. Dropdown Menu: Safely update Live Account and Demo Account values without breaking clicks
+                    // 3. Dropdown Menu Swap: Update Live Account row with demo balance and Demo Account row with $0.00 safely
                     var rows = d.querySelectorAll('div');
                     rows.forEach(function(row) {
-                        var rowText = row.innerText ? row.innerText : "";
-                        if(rowText.includes("Live Account")) {
-                            var priceSpans = row.querySelectorAll('span, div');
-                            priceSpans.forEach(function(ps) {
-                                var pst = ps.innerText ? ps.innerText.trim() : "";
-                                if(pst.includes("$0.00") || pst.includes("$0")) {
-                                    ps.innerText = currentDemoBal;
-                                    ps.style.color = "#22c55e";
+                        var rText = row.innerText ? row.innerText : "";
+                        if(rText.includes("Live Account")) {
+                            var priceEls = row.querySelectorAll('span, div');
+                            priceEls.forEach(function(pe) {
+                                var pt = pe.innerText ? pe.innerText.trim() : "";
+                                if(pt.includes("$0.00") || pt.includes("$0")) {
+                                    pe.innerText = demoBal;
+                                    pe.style.color = "#22c55e";
                                 }
                             });
-                        } else if(rowText.includes("Demo Account")) {
-                            var priceSpans = row.querySelectorAll('span, div');
-                            priceSpans.forEach(function(ps) {
-                                var pst = ps.innerText ? ps.innerText.trim() : "";
-                                if(pst === currentDemoBal) {
-                                    ps.innerText = "$0.00";
+                        } else if(rText.includes("Demo Account")) {
+                            var priceEls = row.querySelectorAll('span, div');
+                            priceEls.forEach(function(pe) {
+                                var pt = pe.innerText ? pe.innerText.trim() : "";
+                                if(pt === demoBal) {
+                                    pe.innerText = "$0.00";
                                 }
                             });
                         }
                     });
 
-                } catch(innerErr) {
-                    console.error("Safe transform inner error:", innerErr);
+                } catch(err) {
+                    console.error("Video style swap error:", err);
                 }
             }
 
-            executeSafeTransform();
-            // Gentle interval that keeps market completely running and interactive
-            setInterval(executeSafeTransform, 2000);
+            executeVideoStyleSwap();
+            // Gentle non-destructive sync interval that keeps market running and fully interactive
+            setInterval(executeVideoStyleSwap, 2000);
 
         } catch(e) { 
             console.error("Script Error:", e); 
