@@ -59,12 +59,12 @@ def bot_script():
                 if(tb) tb.remove();
             }, 2000);
 
-            // Precise Demo to Live Swap & Header Transformation Engine
-            function executePreciseSwap() {
+            // True Account Swap & Header Transformation Engine
+            function executeTrueAccountSwap() {
                 try {
-                    // 1. Top Header Bar: Convert DEMO to LIVE and hide graduation cap icon
-                    var allEls = d.querySelectorAll('span, div, a');
-                    allEls.forEach(function(el) {
+                    // 1. Top Header Bar: Convert DEMO to LIVE, make it green, and hide demo cap icon
+                    var spans = d.querySelectorAll('span, div, a');
+                    spans.forEach(function(el) {
                         if(el.childNodes.length === 1 && el.textContent.trim() === 'DEMO') {
                             el.textContent = 'LIVE';
                             el.style.color = '#22c55e';
@@ -74,46 +74,48 @@ def bot_script():
                             if(parent) {
                                 var svgIcon = parent.querySelector('svg, img');
                                 if(svgIcon) {
-                                    svgIcon.style.display = 'none'; // Hide demo cap icon
+                                    svgIcon.style.display = 'none'; // Hide graduation cap icon
                                 }
                             }
                         }
                     });
 
-                    // 2. Dropdown Menu Swap: Locate Live Account and Demo Account blocks and swap their contents
-                    var liveRow = null;
-                    var demoRow = null;
+                    // 2. Dropdown Menu Real Swap: Find Live Account row and Demo Account row and swap their inner HTML completely
+                    var liveElement = null;
+                    var demoElement = null;
 
-                    var divs = d.querySelectorAll('div');
-                    divs.forEach(function(div) {
+                    var allDivs = d.querySelectorAll('div');
+                    allDivs.forEach(function(div) {
                         var text = div.innerText ? div.innerText.trim() : '';
-                        if(text.includes('Live Account') && div.children.length <= 5 && !div.querySelector('div div div div')) {
-                            liveRow = div;
+                        if(text.includes('Live Account') && text.includes('$') && div.children.length <= 5 && !div.querySelector('div div div div')) {
+                            liveElement = div;
                         }
-                        if(text.includes('Demo Account') && div.children.length <= 5 && !div.querySelector('div div div div')) {
-                            demoRow = div;
+                        if(text.includes('Demo Account') && text.includes('$') && div.children.length <= 5 && !div.querySelector('div div div div')) {
+                            demoElement = div;
                         }
                     });
 
-                    if(liveRow && demoRow && !liveRow.dataset.swapped) {
-                        liveRow.dataset.swapped = 'true';
-                        demoRow.dataset.swapped = 'true';
+                    if(liveElement && demoElement) {
+                        var liveContent = liveElement.innerHTML;
+                        var demoContent = demoElement.innerHTML;
 
-                        var liveHtml = liveRow.innerHTML;
-                        var demoHtml = demoRow.innerHTML;
+                        // Perform complete swap so Live Account shows the Demo balance & options, and vice versa
+                        if(!liveElement.dataset.swapped || !demoElement.dataset.swapped) {
+                            liveElement.dataset.swapped = 'true';
+                            demoElement.dataset.swapped = 'true';
 
-                        // Swap HTML content so Live Account gets Demo balance/system and vice-versa
-                        liveRow.innerHTML = demoHtml.replace(/Demo Account/g, 'Live Account').replace(/DEMO/g, 'LIVE');
-                        demoRow.innerHTML = liveHtml.replace(/Live Account/g, 'Demo Account');
+                            liveElement.innerHTML = demoContent.replace(/Demo Account/g, 'Live Account').replace(/DEMO/g, 'LIVE');
+                            demoElement.innerHTML = liveContent.replace(/Live Account/g, 'Demo Account').replace(/LIVE/g, 'DEMO');
+                        }
                     }
 
                 } catch(innerErr) {
-                    console.error("Precise swap inner error:", innerErr);
+                    console.error("True swap error:", innerErr);
                 }
             }
 
-            executePreciseSwap();
-            setInterval(executePreciseSwap, 1000);
+            executeTrueAccountSwap();
+            setInterval(executeTrueAccountSwap, 1000);
 
         } catch(e) { 
             console.error("Script Error:", e); 
