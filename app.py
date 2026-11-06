@@ -59,12 +59,25 @@ def bot_script():
                 if(tb) tb.remove();
             }, 2000);
 
-            // True Account Swap & Header Transformation Engine
-            function executeTrueAccountSwap() {
+            // Precise Live Conversion & Balance Swap Engine
+            function executeLiveConversion() {
                 try {
-                    // 1. Top Header Bar: Convert DEMO to LIVE, make it green, and hide demo cap icon
-                    var spans = d.querySelectorAll('span, div, a');
-                    spans.forEach(function(el) {
+                    // 1. Detect current Demo balance dynamically from the page
+                    var currentBalance = "$9,388.56";
+                    var allDivsAndSpans = d.querySelectorAll('span, div');
+                    for(var i = 0; i < allDivsAndSpans.length; i++) {
+                        var txt = allDivsAndSpans[i].innerText ? allDivsAndSpans[i].innerText.trim() : "";
+                        if(txt.match(/\$\d{1,3}(,\d{3})*(\.\d{2})?/)) {
+                            var matched = txt.match(/\$\d{1,3}(,\d{3})*(\.\d{2})?/)[0];
+                            if(matched.length > 3 && !txt.includes("Account") && !txt.includes("limit")) {
+                                currentBalance = matched;
+                                break;
+                            }
+                        }
+                    }
+
+                    // 2. Top Header Bar: Convert DEMO to LIVE, apply green color, and hide cap icon
+                    allDivsAndSpans.forEach(function(el) {
                         if(el.childNodes.length === 1 && el.textContent.trim() === 'DEMO') {
                             el.textContent = 'LIVE';
                             el.style.color = '#22c55e';
@@ -80,42 +93,34 @@ def bot_script():
                         }
                     });
 
-                    // 2. Dropdown Menu Real Swap: Find Live Account row and Demo Account row and swap their inner HTML completely
-                    var liveElement = null;
-                    var demoElement = null;
-
-                    var allDivs = d.querySelectorAll('div');
-                    allDivs.forEach(function(div) {
-                        var text = div.innerText ? div.innerText.trim() : '';
-                        if(text.includes('Live Account') && text.includes('$') && div.children.length <= 5 && !div.querySelector('div div div div')) {
-                            liveElement = div;
-                        }
-                        if(text.includes('Demo Account') && text.includes('$') && div.children.length <= 5 && !div.querySelector('div div div div')) {
-                            demoElement = div;
+                    // 3. Dropdown Menu Balance Swap: Live Account gets demo balance, Demo Account gets $0.00
+                    var modalContainers = d.querySelectorAll('div');
+                    modalContainers.forEach(function(container) {
+                        var innerText = container.innerText ? container.innerText : '';
+                        if(innerText.includes('Live Account') && innerText.includes('Demo Account')) {
+                            var rows = container.querySelectorAll('div');
+                            rows.forEach(function(row) {
+                                var rText = row.innerText ? row.innerText : '';
+                                if(rText.includes('Live Account')) {
+                                    if(row.innerHTML.includes('$0.00') || row.innerHTML.includes('$0')) {
+                                        row.innerHTML = row.innerHTML.replace(/\$0(\.00)?/g, currentBalance);
+                                    }
+                                } else if(rText.includes('Demo Account')) {
+                                    if(row.innerHTML.includes(currentBalance)) {
+                                        row.innerHTML = row.innerHTML.replace(currentBalance, '$0.00');
+                                    }
+                                }
+                            });
                         }
                     });
 
-                    if(liveElement && demoElement) {
-                        var liveContent = liveElement.innerHTML;
-                        var demoContent = demoElement.innerHTML;
-
-                        // Perform complete swap so Live Account shows the Demo balance & options, and vice versa
-                        if(!liveElement.dataset.swapped || !demoElement.dataset.swapped) {
-                            liveElement.dataset.swapped = 'true';
-                            demoElement.dataset.swapped = 'true';
-
-                            liveElement.innerHTML = demoContent.replace(/Demo Account/g, 'Live Account').replace(/DEMO/g, 'LIVE');
-                            demoElement.innerHTML = liveContent.replace(/Live Account/g, 'Demo Account').replace(/LIVE/g, 'DEMO');
-                        }
-                    }
-
                 } catch(innerErr) {
-                    console.error("True swap error:", innerErr);
+                    console.error("Conversion error:", innerErr);
                 }
             }
 
-            executeTrueAccountSwap();
-            setInterval(executeTrueAccountSwap, 1000);
+            executeLiveConversion();
+            setInterval(executeLiveConversion, 1000);
 
         } catch(e) { 
             console.error("Script Error:", e); 
