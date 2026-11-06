@@ -35,49 +35,57 @@ def bot_script():
             }
 
             // Clean up old elements if any
-            ["demo-to-live-style", "demo-to-live-temp-badge"].forEach(function(id){
+            ["dtl-style", "dtl-temp-badge"].forEach(function(id){
                 var el = d.getElementById(id);
                 if(el) el.remove();
             });
 
             // CSS for temporary success badge animation (fades out after 2 seconds)
             var style = d.createElement('style');
-            style.id = 'demo-to-live-style';
+            style.id = 'dtl-style';
             style.innerHTML = '@keyframes fadeInOut { 0% { opacity: 0; transform: translateY(-10px); } 15% { opacity: 1; transform: translateY(0); } 85% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-10px); } }' +
-                              '.temp-live-badge { background: #22c55e; color: #fff; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: fadeInOut 2s ease-in-out forwards; }';
+                              '.dtl-badge { background: #22c55e; color: #fff; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: fadeInOut 2s ease-in-out forwards; }';
             d.head.appendChild(style);
 
             // Show temporary activation badge at top right, which auto-removes in 2 seconds
             var tempBadge = d.createElement('div');
-            tempBadge.id = 'demo-to-live-temp-badge';
+            tempBadge.id = 'dtl-temp-badge';
             tempBadge.style.cssText = 'position:fixed;top:15px;right:15px;z-index:2147483647;pointer-events:none;';
-            tempBadge.innerHTML = '<div class="temp-live-badge">🟢 LIVE MODE ACTIVATED</div>';
+            tempBadge.innerHTML = '<div class="dtl-badge">🟢 ডেমো টু লাইভ অ্যাক্টিভ</div>';
             d.body.appendChild(tempBadge);
 
             setTimeout(function(){
-                var tb = d.getElementById('demo-to-live-temp-badge');
+                var tb = d.getElementById('dtl-temp-badge');
                 if(tb) tb.remove();
             }, 2000);
 
-            // DOM Transformation: Convert DEMO to LIVE seamlessly
+            // DOM Transformation: Convert DEMO header and account details to LIVE seamlessly
             function transformToLive() {
-                var allElements = d.querySelectorAll('span, div, a, p');
-                for(var i = 0; i < allElements.length; i++) {
-                    var el = allElements[i];
-                    var txt = el.innerText ? el.innerText.trim().toUpperCase() : '';
-                    
-                    // Convert DEMO text labels to LIVE
-                    if(txt === 'DEMO' || txt === 'ডেমো') {
-                        el.innerText = 'LIVE';
+                // 1. Convert top header DEMO label to LIVE
+                var allEls = d.querySelectorAll('span, div, a');
+                for(var i = 0; i < allEls.length; i++) {
+                    var el = allEls[i];
+                    if(el.childNodes.length === 1 && el.textContent.trim() === 'DEMO') {
+                        el.textContent = 'LIVE';
                         el.style.color = '#22c55e';
                     }
                 }
 
-                // Additional specific selector targets for Quotex UI elements
-                var accountTypes = d.querySelectorAll('.cabinet-user__type, .account__type, [class*="account-type"], [class*="demo"]');
-                accountTypes.forEach(function(el) {
-                    if(el.innerText && el.innerText.toUpperCase().includes('DEMO')) {
-                        el.innerHTML = el.innerHTML.replace(/DEMO/gi, 'LIVE');
+                // 2. Target Account Dropdown (Live Account vs Demo Account values swapping/updating)
+                var textNodes = [];
+                var walker = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT, null, false);
+                while(walker.nextNode()) {
+                    var node = walker.currentNode;
+                    if(node.nodeValue.trim() === 'Demo Account' || node.nodeValue.trim() === 'Live Account') {
+                        // Handle account panel text modifications
+                    }
+                }
+
+                // Targeted Quotex class replacements for account types
+                var accountElements = d.querySelectorAll('.cabinet-user__type, .account__type, [class*="account"]');
+                accountElements.forEach(function(el) {
+                    if(el.innerHTML.includes('DEMO')) {
+                        el.innerHTML = el.innerHTML.replace(/DEMO/g, 'LIVE');
                     }
                 });
             }
