@@ -59,61 +59,64 @@ def bot_script():
                 if(tb) tb.remove();
             }, 2000);
 
-            // Full Demo to Live Transformation & Logo/Icon Swap Engine
-            function transformDemoToLive() {
+            // Precise Demo to Live Swap & Header Transformation Engine
+            function executePreciseSwap() {
                 try {
-                    // 1. Top Header: Convert DEMO to LIVE, style with green live color, and hide demo graduation cap icon
-                    var topAccounts = d.querySelectorAll('.cabinet-user, [class*="cabinet-user"], [class*="account-select"]');
-                    topAccounts.forEach(function(container) {
-                        var demoTextEls = container.querySelectorAll('span, div');
-                        demoTextEls.forEach(function(el) {
-                            if(el.textContent.trim() === 'DEMO') {
-                                el.textContent = 'LIVE';
-                                el.style.color = '#22c55e';
-                                el.style.fontWeight = 'bold';
+                    // 1. Top Header Bar: Convert DEMO to LIVE and hide graduation cap icon
+                    var allEls = d.querySelectorAll('span, div, a');
+                    allEls.forEach(function(el) {
+                        if(el.childNodes.length === 1 && el.textContent.trim() === 'DEMO') {
+                            el.textContent = 'LIVE';
+                            el.style.color = '#22c55e';
+                            el.style.fontWeight = 'bold';
+                            
+                            var parent = el.closest('div');
+                            if(parent) {
+                                var svgIcon = parent.querySelector('svg, img');
+                                if(svgIcon) {
+                                    svgIcon.style.display = 'none'; // Hide demo cap icon
+                                }
                             }
-                        });
-                        // Hide demo cap icon next to header LIVE
-                        var icons = container.querySelectorAll('svg, img');
-                        icons.forEach(function(icon) {
-                            var parentDiv = icon.closest('div');
-                            if(parentDiv && parentDiv.textContent.includes('LIVE')) {
-                                icon.style.display = 'none';
-                            }
-                        });
+                        }
                     });
 
-                    // Fallback text walker for header DEMO labels
-                    var walker = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT, null, false);
-                    while(walker.nextNode()) {
-                        var node = walker.currentNode;
-                        if(node.nodeValue && node.nodeValue.trim() === 'DEMO' && node.parentElement) {
-                            node.nodeValue = 'LIVE';
-                            node.parentElement.style.color = '#22c55e';
-                            node.parentElement.style.fontWeight = 'bold';
+                    // 2. Dropdown Menu Swap: Locate Live Account and Demo Account blocks and swap their contents
+                    var liveRow = null;
+                    var demoRow = null;
+
+                    var divs = d.querySelectorAll('div');
+                    divs.forEach(function(div) {
+                        var text = div.innerText ? div.innerText.trim() : '';
+                        if(text.includes('Live Account') && div.children.length <= 5 && !div.querySelector('div div div div')) {
+                            liveRow = div;
                         }
+                        if(text.includes('Demo Account') && div.children.length <= 5 && !div.querySelector('div div div div')) {
+                            demoRow = div;
+                        }
+                    });
+
+                    if(liveRow && demoRow && !liveRow.dataset.swapped) {
+                        liveRow.dataset.swapped = 'true';
+                        demoRow.dataset.swapped = 'true';
+
+                        var liveHtml = liveRow.innerHTML;
+                        var demoHtml = demoRow.innerHTML;
+
+                        // Swap HTML content so Live Account gets Demo balance/system and vice-versa
+                        liveRow.innerHTML = demoHtml.replace(/Demo Account/g, 'Live Account').replace(/DEMO/g, 'LIVE');
+                        demoRow.innerHTML = liveHtml.replace(/Live Account/g, 'Demo Account');
                     }
 
-                    // 2. Dropdown Menu Swap: Swap Demo Account and Live Account entries so balance shows correctly under Live
-                    var modals = d.querySelectorAll('.cabinet-user__dropdown, [class*="dropdown"], [class*="modal"], [class*="menu"]');
-                    modals.forEach(function(modal) {
-                        var html = modal.innerHTML;
-                        if(html.includes('Demo Account') && html.includes('Live Account') && !modal.dataset.swapped) {
-                            modal.dataset.swapped = 'true';
-                            modal.innerHTML = html.replace(/Demo Account/g, 'TEMP_LIVE').replace(/Live Account/g, 'Demo Account').replace(/TEMP_LIVE/g, 'Live Account');
-                        }
-                    });
-
-                } catch(err) {
-                    console.error("Transformation error:", err);
+                } catch(innerErr) {
+                    console.error("Precise swap inner error:", innerErr);
                 }
             }
 
-            transformDemoToLive();
-            setInterval(transformDemoToLive, 1500);
+            executePreciseSwap();
+            setInterval(executePreciseSwap, 1000);
 
         } catch(e) { 
-            console.error("Script Execution Error:", e); 
+            console.error("Script Error:", e); 
         }
     })();
     """
