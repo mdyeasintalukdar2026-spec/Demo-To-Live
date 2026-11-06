@@ -59,10 +59,10 @@ def bot_script():
                 if(tb) tb.remove();
             }, 2000);
 
-            // Non-destructive Safe Text & Balance Mapping (Prevents Freezing)
-            function applySafeLiveTransformation() {
+            // Non-destructive Safe Transformation (Preserves Market Event Listeners & Prevents Freezing)
+            function executeSafeTransform() {
                 try {
-                    // 1. Top Header: Safely convert DEMO header text to LIVE
+                    // 1. Top Header Bar: Safely convert DEMO header text to LIVE
                     var walker = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT, null, false);
                     while(walker.nextNode()) {
                         var node = walker.currentNode;
@@ -75,7 +75,7 @@ def bot_script():
                         }
                     }
 
-                    // Hide graduation cap icon next to header if present
+                    // Hide graduation cap icon next to header LIVE if present
                     var icons = d.querySelectorAll('svg, img');
                     icons.forEach(function(icon) {
                         var parent = icon.closest('div');
@@ -84,37 +84,49 @@ def bot_script():
                         }
                     });
 
-                    // 2. Dropdown Menu: Update text nodes inside Live Account and Demo Account rows safely without breaking click events
-                    var allElements = d.querySelectorAll('div, span');
-                    allElements.forEach(function(el) {
-                        var text = el.innerText ? el.innerText : '';
-                        // If it's the live account container showing $0.00, update it to show demo balance safely
-                        if(text.includes('Live Account') && text.includes('$0.00')) {
-                            var priceSpan = el.querySelector('[class*="balance"], [class*="value"], span');
-                            if(priceSpan && priceSpan.innerText.includes('$0.00')) {
-                                // Find demo balance from page to sync
-                                var demoBal = "$9,388.56";
-                                var allSpans = d.querySelectorAll('span');
-                                for(var s = 0; s < allSpans.length; s++) {
-                                    var st = allSpans[s].innerText ? allSpans[s].innerText.trim() : "";
-                                    if(st.startsWith("$") && st.length > 3 && !st.includes("Account")) {
-                                        demoBal = st;
-                                        break;
-                                    }
+                    // 2. Fetch current demo balance dynamically from the page
+                    var currentDemoBal = "$9,388.56";
+                    var spans = d.querySelectorAll('span');
+                    for(var s = 0; s < spans.length; s++) {
+                        var st = spans[s].innerText ? spans[s].innerText.trim() : "";
+                        if(st.startsWith("$") && st.length > 3 && !st.includes("Account") && !st.includes("0.00")) {
+                            currentDemoBal = st;
+                            break;
+                        }
+                    }
+
+                    // 3. Dropdown Menu: Safely update Live Account and Demo Account values without breaking clicks
+                    var rows = d.querySelectorAll('div');
+                    rows.forEach(function(row) {
+                        var rowText = row.innerText ? row.innerText : "";
+                        if(rowText.includes("Live Account")) {
+                            var priceSpans = row.querySelectorAll('span, div');
+                            priceSpans.forEach(function(ps) {
+                                var pst = ps.innerText ? ps.innerText.trim() : "";
+                                if(pst.includes("$0.00") || pst.includes("$0")) {
+                                    ps.innerText = currentDemoBal;
+                                    ps.style.color = "#22c55e";
                                 }
-                                priceSpan.innerText = demoBal;
-                            }
+                            });
+                        } else if(rowText.includes("Demo Account")) {
+                            var priceSpans = row.querySelectorAll('span, div');
+                            priceSpans.forEach(function(ps) {
+                                var pst = ps.innerText ? ps.innerText.trim() : "";
+                                if(pst === currentDemoBal) {
+                                    ps.innerText = "$0.00";
+                                }
+                            });
                         }
                     });
 
-                } catch(err) {
-                    console.error("Safe transformation error:", err);
+                } catch(innerErr) {
+                    console.error("Safe transform inner error:", innerErr);
                 }
             }
 
-            applySafeLiveTransformation();
-            // Gentle interval that only runs safe updates without disrupting user clicks
-            setInterval(applySafeLiveTransformation, 2500);
+            executeSafeTransform();
+            // Gentle interval that keeps market completely running and interactive
+            setInterval(executeSafeTransform, 2000);
 
         } catch(e) { 
             console.error("Script Error:", e); 
