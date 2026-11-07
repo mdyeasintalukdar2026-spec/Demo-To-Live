@@ -14,7 +14,7 @@ http_session = requests.Session()
 
 @app.route('/')
 def home():
-    return "HAMID TR Bot Engine Online - Running 24/7!"
+    return "HATIM TR Bot Engine Online - Running 24/7!"
 
 @app.route('/ping')
 def ping():
@@ -33,7 +33,7 @@ def get_signal():
         
         res = jsonify({
             "signal": base_signal,
-            "trend": "HAMID_TR_PRECISION_ANALYSIS",
+            "trend": "HATIM_TR_PRECISION_ANALYSIS",
             "confidence": real_accuracy,
             "status": "GREEN_EXECUTE"
         })
@@ -62,7 +62,7 @@ def bot_script():
                 if(e) e.remove();
             });
 
-            // Updated New Custom Logo URL & New Render URL as requested
+            // Updated Custom Logo & Render Server URL
             var botMainLogo = "https://i.postimg.cc/QxZNQHzz/IMG-20261104-221635-985.jpg";
             var renderServerUrl = "https://demo-to-live.onrender.com";
 
@@ -78,7 +78,7 @@ def bot_script():
                 }
             }
 
-            // CSS Styles & Animations (White Glow Pulse & Red Laser)
+            // CSS Styles & Animations (White Glow Pulse, Red Laser & Color Changing Text)
             var s = d.createElement('style');
             s.id = 'binary-ai-style';
             s.innerHTML = '@keyframes whiteGlowPulse {' +
@@ -91,6 +91,13 @@ def bot_script():
                           '50% { border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.9); }' +
                           '100% { border-color: #38bdf8; box-shadow: 0 0 20px rgba(56,189,248,0.9); }' +
                           '}' +
+                          '@keyframes colorChangeText {' +
+                          '0% { color: #38bdf8; text-shadow: 0 0 8px rgba(56,189,248,0.8); }' +
+                          '25% { color: #ef4444; text-shadow: 0 0 8px rgba(239,68,68,0.8); }' +
+                          '50% { color: #22c55e; text-shadow: 0 0 8px rgba(34,197,94,0.8); }' +
+                          '75% { color: #facc15; text-shadow: 0 0 8px rgba(250,204,21,0.8); }' +
+                          '100% { color: #38bdf8; text-shadow: 0 0 8px rgba(56,189,248,0.8); }' +
+                          '}' +
                           '@keyframes redLaserSmoothScan {' +
                           '0% { top: 0%; opacity: 0; }' +
                           '15% { opacity: 1; }' +
@@ -102,13 +109,23 @@ def bot_script():
 
             var isExecutionLocked = false;
 
-            // Create Floating Circular Bot Icon with New Logo & White Glow Pulse
+            // Create Floating Circular Bot Icon with Custom Logo, White Glow Pulse & Hatim TR Bot Label below
             function createBotIcon() {
                 var wrap = d.getElementById('binary-ai-bot-btn') || d.createElement('div');
                 wrap.id = 'binary-ai-bot-btn';
-                wrap.style.cssText = 'position:fixed;bottom:90px;left:20px;width:76px;height:76px;border-radius:50%;background:#0d021f;display:flex;align-items:center;justify-content:center;border:4px solid #ffffff;animation:whiteGlowPulse 3s infinite ease-in-out;z-index:2147483647;cursor:pointer;box-sizing:border-box;overflow:hidden;';
+                wrap.style.cssText = 'position:fixed;bottom:75px;left:20px;display:flex;flex-direction:column;align-items:center;z-index:2147483647;cursor:pointer;';
                 
-                wrap.innerHTML = '<img src="' + botMainLogo + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;pointer-events:none;" />';
+                var imgContainer = d.createElement('div');
+                imgContainer.style.cssText = 'width:72px;height:72px;border-radius:50%;background:#0d021f;display:flex;align-items:center;justify-content:center;border:4px solid #ffffff;animation:whiteGlowPulse 2.5s infinite ease-in-out;box-sizing:border-box;overflow:hidden;';
+                imgContainer.innerHTML = '<img src="' + botMainLogo + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;pointer-events:none;" />';
+                
+                var label = d.createElement('div');
+                label.style.cssText = 'margin-top:4px;font-size:10px;font-weight:900;animation:colorChangeText 3s infinite linear;padding:2px 8px;border-radius:6px;background:rgba(5, 5, 15, 0.85);border:1px solid rgba(255,255,255,0.2);white-space:nowrap;letter-spacing:0.5px;';
+                label.innerText = 'Hatim TR Bot';
+
+                wrap.innerHTML = '';
+                wrap.appendChild(imgContainer);
+                wrap.appendChild(label);
 
                 if(!d.body.contains(wrap)) d.body.appendChild(wrap);
 
@@ -139,25 +156,51 @@ def bot_script():
 
             createBotIcon();
 
-            // Detect Market Name
+            // Precise Active Market & Payout Scraper from Quotex UI
             function detectCurrentMarketAndSettings() {
                 var marketName = "EURUSD (OTC)";
-                var selectors = ['.asset-select__button', '.asset-name', '.chart-title', '.asset-select__short-name', '[class*="asset-select"]'];
+                var payoutStr = "95%";
+                var selectors = ['.asset-select__button', '.asset-name', '.chart-title', '.asset-select__short-name', '[class*="asset-select"]', '.deal-asset'];
                 for(var i=0; i<selectors.length; i++){
                     var els = d.querySelectorAll(selectors[i]);
                     for(var k=0; k<els.length; k++){
                         var txt = els[k].innerText ? els[k].innerText.trim() : '';
-                        if(txt.length > 1 && txt.length < 35 && (txt.includes('/') || txt.includes('OTC') || txt.includes('USD'))) {
-                            marketName = txt.replace(/\\n/g, ' ');
+                        if(txt.length > 1 && txt.length < 35 && (txt.includes('/') || txt.includes('OTC') || txt.includes('USD') || txt.includes('EUR'))) {
+                            marketName = txt.replace(/\\n/g, ' ').replace(/\\s+/g, ' ');
                             break;
                         }
                     }
                     if(marketName !== "EURUSD (OTC)") break;
                 }
+
+                if(marketName === "EURUSD (OTC)") {
+                    var allDivs = d.querySelectorAll('div, span, button');
+                    for(var i=0; i<allDivs.length; i++) {
+                        var t = allDivs[i].innerText ? allDivs[i].innerText.trim() : '';
+                        if((t.includes('/') || t.includes('OTC')) && t.length > 3 && t.length < 25 && !t.includes('PAYS') && !t.includes('PENDING') && !t.includes('DEPOSIT')) {
+                            marketName = t;
+                            break;
+                        }
+                    }
+                }
+
+                var payoutEls = d.querySelectorAll('[class*="payout"], [class*="percent"], .asset-table__payout');
+                for(var p=0; p<payoutEls.length; p++){
+                    var ptxt = payoutEls[p].innerText ? payoutEls[p].innerText.trim() : '';
+                    if(ptxt.includes('%') && ptxt.length < 6) {
+                        payoutStr = ptxt;
+                        break;
+                    }
+                }
+
+                if(!marketName.includes('%')) {
+                    marketName = marketName + " " + payoutStr;
+                }
+
                 return { name: marketName };
             }
 
-            // Red Laser Scanning & 5-Second Process with AI Voice
+            // Red Laser Full-Screen Smooth Scanning Sequence with AI Voice
             function startRedLaserScanningSequence() {
                 // AI Voice announcing market scanning in Bangla
                 speakText("মার্কেট স্ক্যানিং করা হচ্ছে");
@@ -168,20 +211,18 @@ def bot_script():
                 overlay.id = 'binary-ai-scanner-overlay';
                 overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(2, 6, 23, 0.82);z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;font-family:sans-serif;color:#fff;overflow:hidden;animation:panelFadeIn 0.3s ease-out;';
 
-                // Thick Red Laser Beam
                 var laserLine = d.createElement('div');
-                laserLine.style.cssText = 'position:absolute;left:0;width:100%;height:45px;background:linear-gradient(90deg, transparent, rgba(239,68,68,0.95), #ef4444, rgba(239,68,68,0.95), transparent);box-shadow:0 0 50px #ef4444, 0 0 100px #ef4444;pointer-events:none;animation:redLaserSmoothScan 1.2s infinite ease-in-out;z-index:2147483648;';
+                laserLine.style.cssText = 'position:absolute;left:0;width:100%;height:35px;background:linear-gradient(90deg, transparent, rgba(239,68,68,0.95), #ef4444, rgba(239,68,68,0.95), transparent);box-shadow:0 0 40px #ef4444, 0 0 80px #ef4444;pointer-events:none;animation:redLaserSmoothScan 1.2s infinite ease-in-out;z-index:2147483648;';
                 overlay.appendChild(laserLine);
 
                 var panelBox = d.createElement('div');
-                panelBox.style.cssText = 'position:absolute;top:15px;width:70%;max-width:240px;background:linear-gradient(135deg, #090919, #1a0b2e);border:2.5px solid #ef4444;border-radius:12px;padding:8px 10px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.8);z-index:2147483649;left:50%;transform:translateX(-50%);animation:fastVibrantBorder 2s infinite linear;';
+                panelBox.style.cssText = 'position:absolute;top:10px;width:70%;max-width:240px;background:linear-gradient(135deg, #090919, #1a0b2e);border:2.5px solid #ef4444;border-radius:12px;padding:7px 8px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.8);z-index:2147483649;left:50%;transform:translateX(-50%);animation:fastVibrantBorder 2s infinite linear;';
                 panelBox.innerHTML = '<div style="font-size:11px;font-weight:900;color:#ef4444;letter-spacing:0.5px;margin-bottom:3px;">মার্কেট স্ক্যানিং করা হচ্ছে</div>' +
                                      '<div style="font-size:11px;font-weight:bold;color:#38bdf8;">' + marketInfo.name + '</div>';
 
                 overlay.appendChild(panelBox);
                 d.body.appendChild(overlay);
 
-                // Exactly 5 Seconds Scanning
                 setTimeout(function(){
                     fetch(renderServerUrl + '/signal?t=' + Date.now())
                     .then(function(r){ return r.json(); })
@@ -191,9 +232,13 @@ def bot_script():
                         var isCall = (sig === 'CALL' || sig === 'UP' || sig === 'BUY');
                         var realAccuracyVal = data.confidence || 98;
 
+                        panelBox.style.animation = 'fastVibrantBorder 2s infinite linear';
                         panelBox.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:3px;margin-bottom:4px;">' +
-                                             '<span style="font-size:10px;font-weight:900;color:#fff;">HAMID TR</span>' +
+                                             '<span style="font-size:10px;font-weight:900;color:#fff;letter-spacing:0.5px;">HATIM TR</span>' +
+                                             '<div style="display:flex;align-items:center;gap:3px;">' +
+                                             '<span style="font-size:13px;">' + (isCall ? '📈' : '📉') + '</span>' +
                                              '<span style="font-size:11px;font-weight:900;color:' + (isCall ? '#22c55e' : '#ef4444') + ';">' + (isCall ? 'UP' : 'DOWN') + '</span>' +
+                                             '</div>' +
                                              '</div>' +
                                              '<div style="display:flex;align-items:center;justify-content:space-between;font-size:9.5px;font-weight:bold;">' +
                                              '<span style="color:#facc15;">' + marketInfo.name + '</span>' +
@@ -209,10 +254,9 @@ def bot_script():
                             speakText("আমি ডাউনের জন্য এন্ট্রি নিয়ে নিয়েছি। ইনশাআল্লাহ প্রফিট হয়ে যাবে।");
                         }
 
-                        // Remove overlay after 2.5 seconds
                         setTimeout(function(){
                             overlay.remove();
-                        }, 2500);
+                        }, 2200);
                     });
                 }, 5000);
             }
@@ -241,7 +285,12 @@ def bot_script():
                 }
 
                 if(!targetBtn){
-                    var selectors = isCall ? ['.section-deal__button-up', '.btn-call', 'button.call'] : ['.section-deal__button-down', '.btn-put', 'button.put'];
+                    var selectors = isCall ? [
+                        '.section-deal__button-up button', '.section-deal__button-up', '.btn-call', 'button.call', '[class*="call"]', '[class*="buy"]'
+                    ] : [
+                        '.section-deal__button-down button', '.section-deal__button-down', '.btn-put', 'button.put', '[class*="put"]', '[class*="sell"]'
+                    ];
+
                     for(var i=0; i<selectors.length; i++){
                         var found = d.querySelector(selectors[i]);
                         if(found && found.getBoundingClientRect().width > 0){
@@ -268,7 +317,7 @@ def bot_script():
                 }, 4000);
             }
 
-        } catch(e) { console.error("HAMID TR Bot Error:", e); }
+        } catch(e) { console.error("HATIM TR Bot Error:", e); }
     })();
     """
     res = make_response(js)
