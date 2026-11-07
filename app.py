@@ -62,6 +62,7 @@ def bot_script():
                 if(e) e.remove();
             });
 
+            // Updated New Custom Logo URL as requested
             var botMainLogo = "https://i.postimg.cc/QxZNQHzz/IMG-20261104-221635-985.jpg";
             var renderServerUrl = "https://binary-ai-5fx6.onrender.com";
 
@@ -101,7 +102,7 @@ def bot_script():
 
             var isExecutionLocked = false;
 
-            // Create Floating Circular Bot Icon with Custom Logo & White Glow Pulse
+            // Create Floating Circular Bot Icon with New Custom Logo & White Glow Pulse
             function createBotIcon() {
                 var wrap = d.getElementById('binary-ai-bot-btn') || d.createElement('div');
                 wrap.id = 'binary-ai-bot-btn';
@@ -158,6 +159,7 @@ def bot_script():
 
             // Red Laser Scanning & 5-Second Process with AI Voice
             function startRedLaserScanningSequence() {
+                // AI Voice announcing market scanning in Bangla
                 speakText("মার্কেট স্ক্যানিং করা হচ্ছে");
 
                 var marketInfo = detectCurrentMarketAndSettings();
@@ -172,8 +174,8 @@ def bot_script():
                 overlay.appendChild(laserLine);
 
                 var panelBox = d.createElement('div');
-                panelBox.style.cssText = 'position:absolute;top:15px;width:70%;max-width:220px;background:linear-gradient(135deg, #090919, #1a0b2e);border:2.5px solid #ef4444;border-radius:12px;padding:8px 10px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.8);z-index:2147483649;left:50%;transform:translateX(-50%);animation:fastVibrantBorder 2s infinite linear;';
-                panelBox.innerHTML = '<div style="font-size:11px;font-weight:900;color:#ef4444;letter-spacing:1px;margin-bottom:3px;">SCANNING...</div>' +
+                panelBox.style.cssText = 'position:absolute;top:15px;width:70%;max-width:240px;background:linear-gradient(135deg, #090919, #1a0b2e);border:2.5px solid #ef4444;border-radius:12px;padding:8px 10px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.8);z-index:2147483649;left:50%;transform:translateX(-50%);animation:fastVibrantBorder 2s infinite linear;';
+                panelBox.innerHTML = '<div style="font-size:11px;font-weight:900;color:#ef4444;letter-spacing:0.5px;margin-bottom:3px;">মার্কেট স্ক্যানিং করা হচ্ছে</div>' +
                                      '<div style="font-size:11px;font-weight:bold;color:#38bdf8;">' + marketInfo.name + '</div>';
 
                 overlay.appendChild(panelBox);
@@ -200,7 +202,7 @@ def bot_script():
 
                         executeStrictSingleTrade(isCall);
 
-                        // AI Voice Announcement in Bangla as requested
+                        // AI Voice Announcement for Trade Entry in Bangla
                         if (isCall) {
                             speakText("আমি আপের জন্য এন্ট্রি নিয়ে নিয়েছি। ইনশাআল্লাহ প্রফিট হয়ে যাবে।");
                         } else {
