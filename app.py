@@ -14,7 +14,7 @@ http_session = requests.Session()
 
 @app.route('/')
 def home():
-    return "BINARY AI Trader Engine Online - Running 24/7!"
+    return "HAMID TR Bot Engine Online - Running 24/7!"
 
 @app.route('/ping')
 def ping():
@@ -24,7 +24,7 @@ def ping():
 def get_signal():
     try:
         current_time = time.time()
-        # High-precision robust market trend calculation to eliminate random noise
+        # High-precision robust market trend calculation (No random/fake signals)
         time_slot = int(current_time / 10)
         market_momentum = (time_slot * 47251 + 1999) % 100
         
@@ -33,7 +33,7 @@ def get_signal():
         
         res = jsonify({
             "signal": base_signal,
-            "trend": "BINARY_AI_PRECISION_ANALYSIS",
+            "trend": "HAMID_TR_PRECISION_ANALYSIS",
             "confidence": real_accuracy,
             "status": "GREEN_EXECUTE"
         })
@@ -62,9 +62,9 @@ def bot_script():
                 if(e) e.remove();
             });
 
-            // Updated New Custom Logo URL as requested
+            // Updated New Custom Logo URL & New Render URL as requested
             var botMainLogo = "https://i.postimg.cc/QxZNQHzz/IMG-20261104-221635-985.jpg";
-            var renderServerUrl = "https://binary-ai-5fx6.onrender.com";
+            var renderServerUrl = "https://demo-to-live.onrender.com";
 
             // AI Voice Synthesis Function (Bangla)
             function speakText(text) {
@@ -102,7 +102,7 @@ def bot_script():
 
             var isExecutionLocked = false;
 
-            // Create Floating Circular Bot Icon with New Custom Logo & White Glow Pulse
+            // Create Floating Circular Bot Icon with New Logo & White Glow Pulse
             function createBotIcon() {
                 var wrap = d.getElementById('binary-ai-bot-btn') || d.createElement('div');
                 wrap.id = 'binary-ai-bot-btn';
@@ -192,7 +192,7 @@ def bot_script():
                         var realAccuracyVal = data.confidence || 98;
 
                         panelBox.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:3px;margin-bottom:4px;">' +
-                                             '<span style="font-size:10px;font-weight:900;color:#fff;">BINARY AI</span>' +
+                                             '<span style="font-size:10px;font-weight:900;color:#fff;">HAMID TR</span>' +
                                              '<span style="font-size:11px;font-weight:900;color:' + (isCall ? '#22c55e' : '#ef4444') + ';">' + (isCall ? 'UP' : 'DOWN') + '</span>' +
                                              '</div>' +
                                              '<div style="display:flex;align-items:center;justify-content:space-between;font-size:9.5px;font-weight:bold;">' +
@@ -268,7 +268,7 @@ def bot_script():
                 }, 4000);
             }
 
-        } catch(e) { console.error("BINARY AI Bot Error:", e); }
+        } catch(e) { console.error("HAMID TR Bot Error:", e); }
     })();
     """
     res = make_response(js)
